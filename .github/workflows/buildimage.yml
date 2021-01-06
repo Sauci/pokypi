@@ -1,0 +1,20 @@
+name: CI
+
+on: [push]
+
+jobs:
+  buildLinuxImage:
+    name: Build Linux image
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@master
+      - name: Clone Poky Thud repository
+        run: git clone -b thud git://git.yoctoproject.org/poky
+      - name: Clone Raspberry Pi layer
+        run: git clone -b thud git://git.yoctoproject.org/meta-raspberrypi
+      - name: Generate default build environment
+        run: docker run -v $(pwd):$(pwd) crops/poky --workdir=$(pwd) bash -c "cd poky && source ./oe-init-build-env"
+      - name: Setup modifications
+        run: cp ./bblayers.conf ./poky/build/conf/bblayers.conf && cp ./local.conf ./poky/build/conf/local.conf
+      - name: Build image
+        run: docker run -v $(pwd):$(pwd) crops/poky --workdir=$(pwd) bash -c "cd poky/build && bitbake core-image-base"
