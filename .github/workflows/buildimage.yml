@@ -12,8 +12,8 @@ jobs:
         uses: elgohr/Publish-Docker-Github-Action@master
         with:
           name: docker.pkg.github.com/sauci/pokypi/build
-          username: ${{secrets.GITHUB_PKG_REGISTRY_USERNAME}}
-          password: ${{secrets.GITHUB_PKG_REGISTRY_RW_TOKEN}}
+          username: ${{secrets.PKG_REGISTRY_USERNAME}}
+          password: ${{secrets.PKG_REGISTRY_RW_TOKEN}}
           dockerfile: Dockerfile
           registry: docker.pkg.github.com
 #      - name: Clone Poky Thud repository
