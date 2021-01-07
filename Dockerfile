@@ -25,21 +25,15 @@ USER $USER_NAME
 
 RUN mkdir -p $WORKDIR
 
-WORKDIR $WORKDIR
-RUN git clone -b thud git://git.yoctoproject.org/poky && \
-    cd poky && git clone -b thud git://git.yoctoproject.org/meta-raspberrypi
+COPY poky/ $WORKDIR/poky
 
 WORKDIR $WORKDIR/poky
 RUN . ./oe-init-build-env build
 
 ENV PATH="$WORKDIR/poky/bitbake/bin:${PATH}"
 
-COPY local.conf $WORKDIR/poky/build/conf/local.conf
-COPY bblayers.conf $WORKDIR/poky/build/conf/bblayers.conf
-
 WORKDIR $WORKDIR/poky/build
-RUN bitbake core-image-base
 
-VOLUME ["$WORKDIR/poky/build"]
+VOLUME ["$WORKDIR"]
 
 ENTRYPOINT ["/bin/sh"]
