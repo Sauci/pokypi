@@ -40,6 +40,9 @@ jobs:
           docker login docker.pkg.github.com
           --username ${{secrets.PKG_REGISTRY_USERNAME}}
           --password-stdin
+      - name: Download external layers
+        run: |
+          git clone git://git.yoctoproject.org/meta-raspberrypi poky/meta-raspberrypi
       - name: Initialize Bitbake configuration
         run: >-
           docker run -v $(pwd):/home/pokypi docker.pkg.github.com/sauci/pokypi/build:latest /bin/bash -c
