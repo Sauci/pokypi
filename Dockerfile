@@ -1,7 +1,7 @@
 FROM ubuntu:18.04
 
 ENV USER_NAME pokypi
-ENV WORKDIR /home/$USER_NAME/workdir
+ENV WORKDIR /home/$USER_NAME
 
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y gawk wget git-core \
     diffstat unzip texinfo gcc-multilib build-essential \
