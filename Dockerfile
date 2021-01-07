@@ -34,8 +34,6 @@ RUN . ./oe-init-build-env build
 
 ENV PATH="$WORKDIR/poky/bitbake/bin:${PATH}"
 
-RUN cat $WORKDIR/poky/build/conf/bblayers.conf
-
 COPY local.conf $WORKDIR/poky/build/conf/local.conf
 COPY bblayers.conf $WORKDIR/poky/build/conf/bblayers.conf
 
