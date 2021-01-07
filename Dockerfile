@@ -28,12 +28,11 @@ RUN mkdir -p $WORKDIR
 COPY poky/ $WORKDIR/poky
 
 WORKDIR $WORKDIR/poky
-RUN . ./oe-init-build-env build
+RUN . ./oe-init-build-env $WORKDIR/build
 
 ENV PATH="$WORKDIR/poky/bitbake/bin:${PATH}"
 
-WORKDIR $WORKDIR/poky/build
-
 VOLUME ["$WORKDIR"]
 
-ENTRYPOINT ["/bin/sh"]
+WORKDIR $WORKDIR/build
+ENTRYPOINT ["/bin/bash"]

@@ -4,10 +4,12 @@ on: [push]
 
 jobs:
   buildLinuxImage:
-    name: Build Linux image
+    name: Publish Docker build image
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@master
+        with:
+          submodules: true
       - name: Publish to Github Packages registry
         uses: elgohr/Publish-Docker-Github-Action@master
         with:
