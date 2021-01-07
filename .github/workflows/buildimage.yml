@@ -18,6 +18,36 @@ jobs:
           password: ${{secrets.PKG_REGISTRY_RW_TOKEN}}
           dockerfile: Dockerfile
           registry: docker.pkg.github.com
+  buildBootloaderWithOptions:
+    needs: buildLinuxImage
+    name: Build Linux image
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v1
+        with:
+          submodules: true
+      # https://github.com/facebookresearch/wav2letter/actions/runs/74797824/workflow
+#      - name: Free disk space
+#        run: |
+#          sudo swapoff -a
+#          sudo rm -f /swapfile
+#          sudo apt clean
+#          docker rmi $(docker image ls -aq)
+#          df -h
+      - name: Login to Github Package Registry
+        run: >-
+          echo ${{secrets.PKG_REGISTRY_RW_TOKEN}} |
+          docker login docker.pkg.github.com
+          --username ${{secrets.PKG_REGISTRY_USERNAME}}
+          --password-stdin
+      - name: Initialize Bitbake configuration
+        run: >-
+          docker run -v $(pwd):/home/pokypi docker.pkg.github.com/sauci/pokypi/build:latest /bin/bash -c
+          "cd poky && source ./oe-init-build-env $WORKDIR/build"
+      - name: Build image using Bitbake
+        run: >-
+          docker run -v $(pwd):/home/pokypi docker.pkg.github.com/sauci/pokypi/build:latest /bin/bash -c
+          "cd build && bitbake core-image-base"
 #      - name: Clone Poky Thud repository
 #        run: git clone -b thud git://git.yoctoproject.org/poky
 #      - name: Clone Raspberry Pi layer

@@ -29,5 +29,4 @@ ENV PATH="$WORKDIR/poky/bitbake/bin:${PATH}"
 
 VOLUME ["$WORKDIR"]
 
-WORKDIR $WORKDIR/build
-ENTRYPOINT ["/bin/bash"]
+WORKDIR $WORKDIR
