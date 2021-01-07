@@ -43,7 +43,7 @@ jobs:
       - name: Initialize Bitbake configuration
         run: >-
           docker run -v $(pwd):/home/pokypi docker.pkg.github.com/sauci/pokypi/build:latest /bin/bash -c
-          "cd poky && source ./oe-init-build-env $WORKDIR/build"
+          "cd poky && source ./oe-init-build-env ./../build"
       - name: Build image using Bitbake
         run: >-
           docker run -v $(pwd):/home/pokypi docker.pkg.github.com/sauci/pokypi/build:latest /bin/bash -c
