@@ -21,7 +21,7 @@ jobs:
   buildBootloaderWithOptions:
     needs: buildLinuxImage
     name: Build Linux image
-    runs-on: ubuntu-20.04
+    runs-on: self-hosted
     steps:
       - uses: actions/checkout@v1
         with:
@@ -32,14 +32,6 @@ jobs:
           docker login docker.pkg.github.com
           --username ${{secrets.PKG_REGISTRY_USERNAME}}
           --password-stdin
-      # see https://github.com/facebookresearch/wav2letter/actions/runs/74797824/workflow
-      - name: Free disk space
-        run: |
-          sudo swapoff -a
-          sudo rm -f /swapfile
-          sudo apt clean
-          docker rmi $(docker image ls -aq)
-          df -h
       - name: Download external layers
         run: |
           git clone git://git.yoctoproject.org/meta-raspberrypi poky/meta-raspberrypi
