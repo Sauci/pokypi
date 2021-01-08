@@ -3,7 +3,7 @@ name: CI
 on: [push]
 
 jobs:
-  buildLinuxImage:
+  publishDockerImage:
     name: Publish Docker build image
     runs-on: ubuntu-20.04
     steps:
@@ -18,31 +18,52 @@ jobs:
           password: ${{secrets.PKG_REGISTRY_RW_TOKEN}}
           dockerfile: Dockerfile
           registry: docker.pkg.github.com
-  buildBootloaderWithOptions:
-    needs: buildLinuxImage
-    name: Build Linux image
+  checkoutRepositories:
+    name: Checkout repositories
     runs-on: self-hosted
     steps:
       - uses: actions/checkout@v1
         with:
           submodules: true
-      - name: Login to Github Package Registry
-        run: >-
-          echo ${{secrets.PKG_REGISTRY_RW_TOKEN}} |
-          docker login docker.pkg.github.com
-          --username ${{secrets.PKG_REGISTRY_USERNAME}}
-          --password-stdin
       - name: Download external layers
-        run: |
-          git clone git://git.yoctoproject.org/meta-raspberrypi poky/meta-raspberrypi
+        run: git clone git://git.yoctoproject.org/meta-raspberrypi poky/meta-raspberrypi
+      - name: Change permissions
+        run: chmod -R 777 ${{ github.workspace }}
+  buildLinuxImage:
+    needs:
+      - publishDockerImage
+      - checkoutRepositories
+    name: Build Linux image
+    runs-on: self-hosted
+    container:
+      image: docker.pkg.github.com/sauci/pokypi/build:latest
+      credentials:
+        username: ${{secrets.PKG_REGISTRY_USERNAME}}
+        password: ${{secrets.PKG_REGISTRY_RW_TOKEN}}
+      volumes:
+        - ${{ github.workspace }}:/home/pokypi
+    steps:
+#      - uses: actions/checkout@v1
+#        with:
+#          submodules: true
+#      - name: Download external layers
+#        run: |
+#          git clone git://git.yoctoproject.org/meta-raspberrypi poky/meta-raspberrypi
       - name: Initialize Bitbake configuration
-        run: >-
-          docker run -v $(pwd):/home/pokypi docker.pkg.github.com/sauci/pokypi/build:latest /bin/bash -c
-          "cd poky && source ./oe-init-build-env ./../build"
+        run: cd poky && source ./oe-init-build-env ./../build
       - name: Build image using Bitbake
-        run: >-
-          docker run -v $(pwd):/home/pokypi docker.pkg.github.com/sauci/pokypi/build:latest /bin/bash -c
-          "cd build && bitbake core-image-base"
+        run: cd build && bitbake core-image-base
+  uploadArtifacts:
+    needs:
+      - buildLinuxImage
+    name: Upload artifacts
+    runs-on: self-hosted
+    steps:
+      - uses: actions/upload-artifact@v2
+        name: Upload all artifacts
+        with:
+          name: images
+          path: build/tmp/images
 #      - name: Clone Poky Thud repository
 #        run: git clone -b thud git://git.yoctoproject.org/poky
 #      - name: Clone Raspberry Pi layer
