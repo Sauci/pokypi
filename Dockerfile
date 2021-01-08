@@ -7,7 +7,7 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y gawk wge
     diffstat unzip texinfo gcc-multilib build-essential \
     chrpath socat cpio python python3 python3-pip \
     python3-pexpect xz-utils debianutils iputils-ping \
-    libsdl1.2-dev xterm tar locales
+    libsdl1.2-dev xterm tar locales desktop-file-utils
 
 RUN rm /bin/sh && ln -s bash /bin/sh
 
