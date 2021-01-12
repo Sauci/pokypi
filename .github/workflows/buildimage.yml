@@ -3,21 +3,21 @@ name: CI
 on: [push]
 
 jobs:
-  publishDockerImage:
-    name: Publish Docker build image
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@master
-        with:
-          submodules: true
-      - name: Publish to Github Packages registry
-        uses: elgohr/Publish-Docker-Github-Action@master
-        with:
-          name: docker.pkg.github.com/sauci/pokypi/build
-          username: ${{secrets.PKG_REGISTRY_USERNAME}}
-          password: ${{secrets.PKG_REGISTRY_RW_TOKEN}}
-          dockerfile: Dockerfile
-          registry: docker.pkg.github.com
+#  publishDockerImage:
+#    name: Publish Docker build image
+#    runs-on: ubuntu-20.04
+#    steps:
+#      - uses: actions/checkout@master
+#        with:
+#          submodules: true
+#      - name: Publish to Github Packages registry
+#        uses: elgohr/Publish-Docker-Github-Action@master
+#        with:
+#          name: docker.pkg.github.com/sauci/pokypi/build
+#          username: ${{secrets.PKG_REGISTRY_USERNAME}}
+#          password: ${{secrets.PKG_REGISTRY_RW_TOKEN}}
+#          dockerfile: Dockerfile
+#          registry: docker.pkg.github.com
   checkoutRepositories:
     name: Checkout repositories
     runs-on: self-hosted
@@ -31,17 +31,17 @@ jobs:
         run: chmod -R 777 ${{ github.workspace }}
   buildLinuxImage:
     needs:
-      - publishDockerImage
+#      - publishDockerImage
       - checkoutRepositories
     name: Build Linux image
     runs-on: self-hosted
     container:
-      image: docker.pkg.github.com/sauci/pokypi/build:latest
-      credentials:
-        username: ${{secrets.PKG_REGISTRY_USERNAME}}
-        password: ${{secrets.PKG_REGISTRY_RW_TOKEN}}
+      image: crops/poky
+#      credentials:
+#        username: ${{secrets.PKG_REGISTRY_USERNAME}}
+#        password: ${{secrets.PKG_REGISTRY_RW_TOKEN}}
       volumes:
-        - ${{ github.workspace }}:/home/pokypi
+        - ${{ github.workspace }}:/workdir
     steps:
 #      - uses: actions/checkout@v1
 #        with:
@@ -49,10 +49,10 @@ jobs:
 #      - name: Download external layers
 #        run: |
 #          git clone git://git.yoctoproject.org/meta-raspberrypi poky/meta-raspberrypi
-      - name: Initialize Bitbake configuration
-        run: cd poky && source ./oe-init-build-env ./../build
+#      - name: Initialize Bitbake configuration
+#        run: cd poky && source ./oe-init-build-env ./../build
       - name: Build image using Bitbake
-        run: cd build && bitbake core-image-base
+        run: cd poky && source ./oe-init-build-env ./../build && cd ../build && bitbake core-image-base
   uploadArtifacts:
     needs:
       - buildLinuxImage
