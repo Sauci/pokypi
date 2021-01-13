@@ -27,7 +27,7 @@ jobs:
       - name: Configure build
         run: cp -R build poky/build
       - name: Build image
-        run: cd poky && source ./oe-init-build-env && bitbake core-image-base
+        run: cd poky && source ./oe-init-build-env && bitbake rpi-basic-image
   uploadArtifacts:
     needs:
       - buildLinuxImage
@@ -38,4 +38,4 @@ jobs:
         name: Upload all artifacts
         with:
           name: images
-          path: build/tmp/images
+          path: poky/build/tmp/deploy/images/raspberrypi3
