@@ -1,6 +1,6 @@
-git clone -b thud git://git.yoctoproject.org/poky poky
-git clone -b thud git://git.yoctoproject.org/meta-raspberrypi meta-raspberrypi
-mkdir build
+chmod -R 777 poky
+chmod -R 777 meta-raspberrypi
+mkdir -p build
 cp -R conf build
 source ./poky/oe-init-build-env ./build
 bitbake rpi-basic-image
