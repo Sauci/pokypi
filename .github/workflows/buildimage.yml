@@ -3,31 +3,36 @@ name: CI
 on: [push]
 
 jobs:
-  checkoutRepositories:
-    name: Checkout repositories
+#  checkoutRepositories:
+#    name: Checkout repositories
+#    runs-on: self-hosted
+#    steps:
+#      - uses: actions/checkout@v1
+#        with:
+#          submodules: true
+#      - name: Download external layers
+#        run: git clone git://git.yoctoproject.org/meta-raspberrypi poky/meta-raspberrypi
+#      - name: Change permissions
+#        run: chmod -R 777 ${{ github.workspace }}
+  buildLinuxImage:
+#    needs:
+#      - checkoutRepositories
+    name: Build Linux image
     runs-on: self-hosted
+#    container:
+#      image: crops/poky
+#      volumes:
+#        - ${{ github.workspace }}:/workdir
     steps:
       - uses: actions/checkout@v1
         with:
           submodules: true
-      - name: Download external layers
-        run: git clone git://git.yoctoproject.org/meta-raspberrypi poky/meta-raspberrypi
-      - name: Change permissions
-        run: chmod -R 777 ${{ github.workspace }}
-  buildLinuxImage:
-    needs:
-      - checkoutRepositories
-    name: Build Linux image
-    runs-on: self-hosted
-    container:
-      image: crops/poky
-      volumes:
-        - ${{ github.workspace }}:/workdir
-    steps:
-      - name: Configure build
-        run: cp -R build poky/build
-      - name: Build image
-        run: cd poky && source ./oe-init-build-env && bitbake rpi-basic-image
+      - name: Build using Docker
+        run: ./build.sh
+#      - name: Configure build
+#        run: cp -R build poky/build
+#      - name: Build image
+#        run: cd poky && source ./oe-init-build-env && bitbake rpi-basic-image
   uploadArtifacts:
     needs:
       - buildLinuxImage
@@ -35,7 +40,6 @@ jobs:
     runs-on: self-hosted
     steps:
       - uses: actions/upload-artifact@v2
-        name: Upload all artifacts
         with:
           name: images
           path: poky/build/tmp/deploy/images/raspberrypi3
